@@ -871,6 +871,117 @@
       pointer-events: none;
     }
 
+    /* ===== TESTIMONIALS ===== */
+    .testimonials {
+      background: var(--cream);
+      overflow: hidden;
+    }
+    .testimonials-track {
+      display: flex;
+      gap: 20px;
+      margin-top: 3rem;
+      animation: scroll-left 40s linear infinite;
+      width: max-content;
+    }
+    .testimonials-track:hover {
+      animation-play-state: paused;
+    }
+    @keyframes scroll-left {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .testimonial-card {
+      flex-shrink: 0;
+      width: 340px;
+      padding: 28px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: all 0.3s ease;
+    }
+    .testimonial-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: transparent;
+    }
+    .testimonial-quote {
+      font-size: 0.9rem;
+      color: var(--charcoal-light);
+      line-height: 1.65;
+      margin-bottom: 16px;
+    }
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .testimonial-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--cream-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--teal);
+    }
+    .testimonial-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--charcoal);
+    }
+    .testimonial-handle {
+      font-size: 0.75rem;
+      color: var(--teal);
+    }
+
+    /* ===== INTEGRATIONS ===== */
+    .integrations {
+      background: var(--cream);
+    }
+    .integrations-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 2.5rem;
+      justify-content: center;
+    }
+    .integration-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--charcoal);
+      transition: all 0.25s ease;
+      cursor: default;
+    }
+    .integration-badge:hover {
+      border-color: var(--teal);
+      background: rgba(27, 123, 110, 0.03);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+    .integration-badge .badge-icon {
+      font-size: 1.1rem;
+    }
+    .integrations-note {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--slate);
+    }
+    .integrations-note a {
+      color: var(--teal);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
     /* ===== FOOTER ===== */
     footer {
       padding: 60px clamp(1.5rem, 4vw, 3rem) 40px;
@@ -1011,7 +1122,7 @@
           <span class="badge-dot"></span>
           Based on OpenClaw &middot; 185K Stars
         </div>
-        <h1>Cloud AI on <em>your</em> desktop.</h1>
+        <h1>OpenClaw, but <em>one&nbsp;click.</em></h1>
         <p class="hero-sub">
           The polished desktop app built on <a href="https://github.com/openclaw/openclaw" target="_blank" rel="noopener" style="color: var(--teal); text-decoration: underline; text-underline-offset: 3px;">OpenClaw</a>, the open-source AI assistant with 185K GitHub stars.
           Private by default. Connect any provider. Control everything.
@@ -1161,6 +1272,249 @@
           <p>Extend with community skills or build your own. Gmail, GitHub, Spotify, smart home — the ecosystem grows daily.</p>
         </article>
       </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials" id="testimonials">
+    <div class="section-inner">
+      <div class="reveal">
+        <p class="section-label">What people say</p>
+        <h2 class="section-title">Loved by thousands<br>of OpenClaw users.</h2>
+        <p class="section-desc">o6w brings the same experience people already love — now as a polished desktop app.</p>
+      </div>
+    </div>
+    <div class="testimonials-track">
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"Tried Claw by @steipete. I tried to build my own AI assistant bots before, and I am very impressed how many hard things Claw gets right. Persistent memory, persona onboarding, context awareness."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">AD</div>
+          <div>
+            <div class="testimonial-name">Aryeh Dubois</div>
+            <div class="testimonial-handle">@AryehDubois</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"Got OpenClaw set up and now I have an AI assistant named Claudia who lives in Telegram, remembers everything I tell her, and can actually *do* stuff. She just wrote this tweet. Meta."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">DW</div>
+          <div>
+            <div class="testimonial-name">Darren Walker</div>
+            <div class="testimonial-handle">@darrwalk</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"OpenClaw is the first 'software' in ages for which I constantly check for new releases on GitHub. It's hard to put into words. It's a special project."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">CN</div>
+          <div>
+            <div class="testimonial-name">Christoph Nakazawa</div>
+            <div class="testimonial-handle">@cnakazawa</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"Me reading about @openclaw: 'this looks complicated' — me 30 mins later: controlling Gmail, Calendar, WordPress, Hetzner from Telegram like a boss. Smooth as single malt."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">A8</div>
+          <div>
+            <div class="testimonial-name">Abhay</div>
+            <div class="testimonial-handle">@Abhay08</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"OpenClaw is a 24/7 assistant with access to its own computer. What if there were ten, or a hundred, or a thousand? All running 24/7 in the cloud with access to your files, Gmail, calendar..."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">NV</div>
+          <div>
+            <div class="testimonial-name">Nick Vasiles</div>
+            <div class="testimonial-handle">@nickvasiles</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"Just shipped my first personal AI assistant. On WhatsApp. Builds my second brain while I chat. Memory moves across agents (Codex, Cursor, Manus, etc.)"</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">CT</div>
+          <div>
+            <div class="testimonial-name">Christine Tyip</div>
+            <div class="testimonial-handle">@christinetyip</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"Finally gave in and set up @openclaw and it's so damn good on WhatsApp!! It works like a charm!"</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">CC</div>
+          <div>
+            <div class="testimonial-name">CryptikCell</div>
+            <div class="testimonial-handle">@cryptikcell</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"Autonomous Claude Code loops from my phone. 'fix tests' via Telegram. Runs the loop, sends progress every 5 iterations."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">PH</div>
+          <div>
+            <div class="testimonial-name">php100</div>
+            <div class="testimonial-handle">@php100</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"I wanted to automate some tasks from Todoist and claw was able to create a skill for it on its own, all within a Telegram chat."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">SJ</div>
+          <div>
+            <div class="testimonial-name">Subhrajyoti</div>
+            <div class="testimonial-handle">@iamsubhrajyoti</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"Just told Ema, my @openclaw, via Telegram to turn off the PC (and herself, as she was running on it). Executed perfectly. Such a cool tool."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">BB</div>
+          <div>
+            <div class="testimonial-name">Bangkok Build</div>
+            <div class="testimonial-handle">@bangkokbuild</div>
+          </div>
+        </div>
+      </div>
+      <!-- Duplicate set for seamless infinite scroll -->
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"Tried Claw by @steipete. I tried to build my own AI assistant bots before, and I am very impressed how many hard things Claw gets right. Persistent memory, persona onboarding, context awareness."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">AD</div>
+          <div>
+            <div class="testimonial-name">Aryeh Dubois</div>
+            <div class="testimonial-handle">@AryehDubois</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"Got OpenClaw set up and now I have an AI assistant named Claudia who lives in Telegram, remembers everything I tell her, and can actually *do* stuff. She just wrote this tweet. Meta."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">DW</div>
+          <div>
+            <div class="testimonial-name">Darren Walker</div>
+            <div class="testimonial-handle">@darrwalk</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"OpenClaw is the first 'software' in ages for which I constantly check for new releases on GitHub. It's hard to put into words. It's a special project."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">CN</div>
+          <div>
+            <div class="testimonial-name">Christoph Nakazawa</div>
+            <div class="testimonial-handle">@cnakazawa</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"Me reading about @openclaw: 'this looks complicated' — me 30 mins later: controlling Gmail, Calendar, WordPress, Hetzner from Telegram like a boss. Smooth as single malt."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">A8</div>
+          <div>
+            <div class="testimonial-name">Abhay</div>
+            <div class="testimonial-handle">@Abhay08</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"OpenClaw is a 24/7 assistant with access to its own computer. What if there were ten, or a hundred, or a thousand? All running 24/7 in the cloud with access to your files, Gmail, calendar..."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">NV</div>
+          <div>
+            <div class="testimonial-name">Nick Vasiles</div>
+            <div class="testimonial-handle">@nickvasiles</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"Just shipped my first personal AI assistant. On WhatsApp. Builds my second brain while I chat. Memory moves across agents (Codex, Cursor, Manus, etc.)"</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">CT</div>
+          <div>
+            <div class="testimonial-name">Christine Tyip</div>
+            <div class="testimonial-handle">@christinetyip</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"Finally gave in and set up @openclaw and it's so damn good on WhatsApp!! It works like a charm!"</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">CC</div>
+          <div>
+            <div class="testimonial-name">CryptikCell</div>
+            <div class="testimonial-handle">@cryptikcell</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"Autonomous Claude Code loops from my phone. 'fix tests' via Telegram. Runs the loop, sends progress every 5 iterations."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">PH</div>
+          <div>
+            <div class="testimonial-name">php100</div>
+            <div class="testimonial-handle">@php100</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"I wanted to automate some tasks from Todoist and claw was able to create a skill for it on its own, all within a Telegram chat."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">SJ</div>
+          <div>
+            <div class="testimonial-name">Subhrajyoti</div>
+            <div class="testimonial-handle">@iamsubhrajyoti</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"Just told Ema, my @openclaw, via Telegram to turn off the PC (and herself, as she was running on it). Executed perfectly. Such a cool tool."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">BB</div>
+          <div>
+            <div class="testimonial-name">Bangkok Build</div>
+            <div class="testimonial-handle">@bangkokbuild</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORKS WITH EVERYTHING -->
+  <section class="integrations" id="integrations">
+    <div class="section-inner" style="text-align: center;">
+      <div class="reveal">
+        <p class="section-label">Integrations</p>
+        <h2 class="section-title" style="margin-left: auto; margin-right: auto;">Works with everything.</h2>
+        <p class="section-desc" style="margin-left: auto; margin-right: auto;">Connect to the apps and services you already use. Over 50+ integrations and growing.</p>
+      </div>
+      <div class="integrations-grid reveal">
+        <span class="integration-badge"><span class="badge-icon">💬</span> WhatsApp</span>
+        <span class="integration-badge"><span class="badge-icon">📨</span> Telegram</span>
+        <span class="integration-badge"><span class="badge-icon">💼</span> Slack</span>
+        <span class="integration-badge"><span class="badge-icon">🎮</span> Discord</span>
+        <span class="integration-badge"><span class="badge-icon">🔒</span> Signal</span>
+        <span class="integration-badge"><span class="badge-icon">💬</span> iMessage</span>
+        <span class="integration-badge"><span class="badge-icon">📧</span> Gmail</span>
+        <span class="integration-badge"><span class="badge-icon">🐙</span> GitHub</span>
+        <span class="integration-badge"><span class="badge-icon">🎵</span> Spotify</span>
+        <span class="integration-badge"><span class="badge-icon">🐦</span> Twitter / X</span>
+        <span class="integration-badge"><span class="badge-icon">🦁</span> Brave</span>
+        <span class="integration-badge"><span class="badge-icon">📅</span> Calendar</span>
+        <span class="integration-badge"><span class="badge-icon">🎵</span> Last.fm</span>
+        <span class="integration-badge"><span class="badge-icon">💳</span> Cashier</span>
+        <span class="integration-badge"><span class="badge-icon">🏠</span> Smart Home</span>
+      </div>
+      <p class="integrations-note reveal">Over 50+ integrations via <a href="https://github.com/openclaw/openclaw" target="_blank" rel="noopener">OpenClaw skills</a>. Build your own or install from the community.</p>
     </div>
   </section>
 

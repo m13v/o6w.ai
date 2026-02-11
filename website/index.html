@@ -1665,8 +1665,8 @@
         }, 2000);
         return;
       }
-      // In production, POST to your API
-      console.log('Waitlist signup:', { email, platform: selectedPlatform });
+      posthog.identify(email, { email: email });
+      posthog.capture('waitlist_signup', { email: email, platform: selectedPlatform });
       document.querySelector('.waitlist-form').style.display = 'none';
       document.getElementById('waitlistSuccess').classList.add('show');
     }

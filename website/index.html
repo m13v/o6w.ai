@@ -1758,5 +1758,49 @@
     });
     heroObserver.observe(document.querySelector('.hero'));
   </script>
+
+  <!-- Crisp Chat -->
+  <script type="text/javascript">
+    window.$crisp = [];
+    window.CRISP_WEBSITE_ID = '11e6e4bd-b3df-4e47-8a9f-7fbde1d448a8';
+    (function() {
+      var d = document;
+      var s = d.createElement('script');
+      s.src = 'https://client.crisp.chat/l.js';
+      s.async = 1;
+      d.getElementsByTagName('head')[0].appendChild(s);
+
+      // Configure after load
+      var t = setInterval(function() {
+        if (window.$crisp && window.$crisp.push) {
+          window.$crisp.push(['config', 'color:theme', ['teal']]);
+          window.$crisp.push(['set', 'session:data', [[ ['site', 'o6w.ai'], ['page', window.location.pathname] ]]]);
+          clearInterval(t);
+        }
+      }, 100);
+    })();
+
+    // Suppress Crisp errors
+    window.addEventListener('error', function(e) {
+      if (e.message && e.message.indexOf('Invalid data') !== -1 || e.filename && e.filename.indexOf('crisp') !== -1) {
+        e.preventDefault();
+        return true;
+      }
+    });
+  </script>
+
+  <!-- PostHog Analytics -->
+  <script>
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group identify setPersonProperties setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags resetGroups onFeatureFlags addFeatureFlagsHandler onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+    posthog.init('phc_aJRMgtAD1FWl349tmYoxt1jBSfZwJnRdwikPDoR0Z2A', {
+      api_host: 'https://us.i.posthog.com',
+      person_profiles: 'always',
+      capture_pageview: true,
+      capture_pageleave: true,
+      session_recording: {
+        maskAllInputs: true
+      }
+    });
+  </script>
 </body>
 </html>

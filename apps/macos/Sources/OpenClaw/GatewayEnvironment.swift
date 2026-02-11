@@ -111,6 +111,21 @@ enum GatewayEnvironment {
         let expected = self.expectedGatewayVersion()
         let expectedString = self.expectedGatewayVersionString()
 
+        // Bundled mode: Node + gateway are inside the .app — skip PATH-based checks entirely.
+        if let bundledNode = CommandResolver.bundledNodeBinary(),
+           let bundledEntry = CommandResolver.bundledGatewayEntrypoint()
+        {
+            let gatewayDir = URL(fileURLWithPath: bundledEntry).deletingLastPathComponent()
+            let installed = self.readLocalGatewayVersion(projectRoot: gatewayDir)
+            let versionText = installed?.description ?? "bundled"
+            return GatewayEnvironmentStatus(
+                kind: .ok,
+                nodeVersion: "bundled",
+                gatewayVersion: versionText,
+                requiredGateway: expectedString,
+                message: "Node bundled (\(bundledNode)); gateway \(versionText) (bundled)")
+        }
+
         let projectRoot = CommandResolver.projectRoot()
         let projectEntrypoint = CommandResolver.gatewayEntrypoint(in: projectRoot)
 
@@ -178,6 +193,22 @@ enum GatewayEnvironment {
                 self.logger.debug("gateway command resolve ok (\(elapsedMs, privacy: .public)ms)")
             }
         }
+
+        // Bundled mode: Node + gateway inside the .app — no PATH needed.
+        if let bundledNode = CommandResolver.bundledNodeBinary(),
+           let bundledEntry = CommandResolver.bundledGatewayEntrypoint()
+        {
+            let status = self.check()
+            let port = self.gatewayPort()
+            let bind = self.preferredGatewayBind() ?? "loopback"
+            let cmd = [
+                bundledNode, bundledEntry,
+                "gateway", "--port", "\(port)", "--bind", bind,
+                "--allow-unconfigured",
+            ]
+            return GatewayCommandResolution(status: status, command: cmd)
+        }
+
         let projectRoot = CommandResolver.projectRoot()
         let projectEntrypoint = CommandResolver.gatewayEntrypoint(in: projectRoot)
         let status = self.check()

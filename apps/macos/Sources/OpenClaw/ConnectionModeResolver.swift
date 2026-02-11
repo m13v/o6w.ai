@@ -43,6 +43,11 @@ enum ConnectionModeResolver {
             return EffectiveConnectionMode(mode: storedMode, source: .userDefaults)
         }
 
+        // When the app bundles its own gateway, default to local mode even before onboarding.
+        if CommandResolver.bundledGatewayEntrypoint() != nil {
+            return EffectiveConnectionMode(mode: .local, source: .onboarding)
+        }
+
         let seen = defaults.bool(forKey: "openclaw.onboardingSeen")
         return EffectiveConnectionMode(mode: seen ? .local : .unconfigured, source: .onboarding)
     }

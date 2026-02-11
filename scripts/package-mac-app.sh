@@ -128,7 +128,7 @@ cd "$ROOT_DIR/apps/macos"
 echo "🔨 Building $PRODUCT ($BUILD_CONFIG) [${BUILD_ARCHS[*]}]"
 for arch in "${BUILD_ARCHS[@]}"; do
   BUILD_PATH="$(build_path_for_arch "$arch")"
-  swift build -c "$BUILD_CONFIG" --product "$PRODUCT" --build-path "$BUILD_PATH" --arch "$arch" -Xlinker -rpath -Xlinker @executable_path/../Frameworks
+  xcrun swift build -c "$BUILD_CONFIG" --product "$PRODUCT" --build-path "$BUILD_PATH" --arch "$arch" -Xlinker -rpath -Xlinker @executable_path/../Frameworks
 done
 
 BIN_PRIMARY="$(bin_for_arch "$PRIMARY_ARCH")"
@@ -250,6 +250,102 @@ else
     echo "ERROR: Textual resource bundle not found. Set ALLOW_MISSING_TEXTUAL_BUNDLE=1 to bypass." >&2
     exit 1
   fi
+fi
+
+# ---------------------------------------------------------------------------
+# Bundle Node.js binary
+# ---------------------------------------------------------------------------
+NODE_VERSION="${BUNDLED_NODE_VERSION:-22.14.0}"
+NODE_CACHE="$ROOT_DIR/.cache/node"
+mkdir -p "$NODE_CACHE"
+
+node_arch_name() {
+  case "$1" in
+    arm64) echo "arm64" ;;
+    x86_64) echo "x64" ;;
+    *) echo "$1" ;;
+  esac
+}
+
+NODE_BINS=()
+for arch in "${BUILD_ARCHS[@]}"; do
+  NARCH="$(node_arch_name "$arch")"
+  TARBALL="node-v${NODE_VERSION}-darwin-${NARCH}.tar.gz"
+  TARBALL_PATH="$NODE_CACHE/$TARBALL"
+  NODE_BIN="$NODE_CACHE/node-v${NODE_VERSION}-darwin-${NARCH}/bin/node"
+
+  if [ ! -f "$NODE_BIN" ]; then
+    if [ ! -f "$TARBALL_PATH" ]; then
+      echo "📥 Downloading Node.js $NODE_VERSION ($NARCH)"
+      curl -fSL "https://nodejs.org/dist/v${NODE_VERSION}/${TARBALL}" -o "$TARBALL_PATH"
+    fi
+    echo "📦 Extracting Node.js ($NARCH)"
+    tar -xzf "$TARBALL_PATH" -C "$NODE_CACHE" "node-v${NODE_VERSION}-darwin-${NARCH}/bin/node"
+  fi
+  NODE_BINS+=("$NODE_BIN")
+done
+
+mkdir -p "$APP_ROOT/Contents/Resources/node/bin"
+if [[ "${#NODE_BINS[@]}" -gt 1 ]]; then
+  echo "🔗 Creating universal Node.js binary"
+  /usr/bin/lipo -create "${NODE_BINS[@]}" -output "$APP_ROOT/Contents/Resources/node/bin/node"
+else
+  cp "${NODE_BINS[0]}" "$APP_ROOT/Contents/Resources/node/bin/node"
+fi
+chmod +x "$APP_ROOT/Contents/Resources/node/bin/node"
+# Strip any existing ad-hoc signature (will be re-signed later with JIT entitlements).
+/usr/bin/codesign --remove-signature "$APP_ROOT/Contents/Resources/node/bin/node" 2>/dev/null || true
+
+# ---------------------------------------------------------------------------
+# Bundle Gateway (JS)
+# ---------------------------------------------------------------------------
+echo "📦 Copying gateway files"
+GATEWAY_DEST="$APP_ROOT/Contents/Resources/gateway"
+mkdir -p "$GATEWAY_DEST"
+
+for item in openclaw.mjs package.json; do
+  if [ -f "$ROOT_DIR/$item" ]; then
+    cp "$ROOT_DIR/$item" "$GATEWAY_DEST/"
+  fi
+done
+
+for dir in dist node_modules skills extensions docs; do
+  if [ -d "$ROOT_DIR/$dir" ]; then
+    cp -R "$ROOT_DIR/$dir" "$GATEWAY_DEST/"
+  fi
+done
+
+# ---------------------------------------------------------------------------
+# Prune node_modules for size
+# ---------------------------------------------------------------------------
+if [ -d "$GATEWAY_DEST/node_modules" ]; then
+  echo "🧹 Pruning bundled node_modules"
+  NM="$GATEWAY_DEST/node_modules"
+
+  # Remove dev-only / type-only packages
+  rm -rf "$NM/@types" "$NM/typescript" "$NM/vitest"
+
+  # Remove non-darwin platform directories (native addons ship per-platform)
+  find "$NM" -type d \( \
+    -name "linux-*" -o -name "win32-*" -o -name "android-*" \
+    -o -name "freebsd-*" -o -name "sunos-*" \
+  \) -exec rm -rf {} + 2>/dev/null || true
+
+  # Remove test/spec directories, TypeScript declarations, changelogs, READMEs
+  find "$NM" -type d \( -name "test" -o -name "tests" -o -name "__tests__" -o -name "spec" -o -name ".github" \) -exec rm -rf {} + 2>/dev/null || true
+  find "$NM" -type f \( \
+    -name "*.d.ts" -o -name "*.d.ts.map" -o -name "*.d.mts" \
+    -o -name "CHANGELOG.md" -o -name "CHANGELOG" -o -name "changelog.md" \
+    -o -name "README.md" -o -name "readme.md" \
+    -o -name "HISTORY.md" -o -name "LICENSE.md" -o -name "LICENSE" \
+    -o -name ".npmignore" -o -name ".eslintrc*" -o -name ".prettierrc*" \
+    -o -name "tsconfig.json" -o -name "tsconfig.*.json" \
+    -o -name "*.ts" ! -name "*.d.ts" \
+  \) -delete 2>/dev/null || true
+
+  # Remove Playwright browser binaries (large, not needed at runtime)
+  find "$NM" -type d -name ".local-browsers" -exec rm -rf {} + 2>/dev/null || true
+  find "$NM" -path "*/playwright-core/browsers*" -exec rm -rf {} + 2>/dev/null || true
 fi
 
 echo "⏹  Stopping any running OpenClaw"

@@ -2,6 +2,10 @@ import ConcurrencyExtras
 import Foundation
 import OSLog
 
+/// Accessor for the bundled gateway token, set by GatewayProcessManager at launch.
+/// Using a closure avoids a direct dependency on the @MainActor-isolated manager.
+nonisolated(unsafe) var _bundledGatewayTokenAccessor: (() -> String?)?
+
 enum GatewayEndpointState: Sendable, Equatable {
     case ready(mode: AppState.ConnectionMode, url: URL, token: String?, password: String?)
     case connecting(mode: AppState.ConnectionMode, detail: String)
@@ -152,6 +156,12 @@ actor GatewayEndpointStore {
         env: [String: String],
         launchdSnapshot: LaunchAgentPlistSnapshot?) -> String?
     {
+        // Bundled gateway token takes priority — the bundled process generates a random token
+        // and exposes it via GatewayProcessManager so the app can authenticate.
+        if !isRemote, let bundledToken = _bundledGatewayTokenAccessor?() {
+            return bundledToken
+        }
+
         let raw = env["OPENCLAW_GATEWAY_TOKEN"] ?? ""
         let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         if !trimmed.isEmpty {

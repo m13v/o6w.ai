@@ -247,6 +247,24 @@ verify_team_ids() {
   fi
 }
 
+# Sign bundled Node.js binary (needs JIT entitlements for V8)
+BUNDLED_NODE="$APP_BUNDLE/Contents/Resources/node/bin/node"
+if [ -f "$BUNDLED_NODE" ]; then
+  echo "Signing bundled Node.js binary (JIT entitlements)"
+  sign_item "$BUNDLED_NODE" "$ENT_TMP_RUNTIME"
+fi
+
+# Sign native .node addons in bundled gateway
+GATEWAY_NM="$APP_BUNDLE/Contents/Resources/gateway/node_modules"
+if [ -d "$GATEWAY_NM" ]; then
+  find "$GATEWAY_NM" -name "*.node" -type f -print0 | while IFS= read -r -d '' addon; do
+    if /usr/bin/file "$addon" | /usr/bin/grep -q "Mach-O"; then
+      echo "Signing native addon: $(basename "$addon")"
+      sign_item "$addon" "$ENT_TMP_RUNTIME"
+    fi
+  done
+fi
+
 # Sign main binary
 if [ -f "$APP_BUNDLE/Contents/MacOS/OpenClaw" ]; then
   echo "Signing main binary"; sign_item "$APP_BUNDLE/Contents/MacOS/OpenClaw" "$APP_ENTITLEMENTS"

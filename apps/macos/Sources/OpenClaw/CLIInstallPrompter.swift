@@ -37,6 +37,8 @@ final class CLIInstallPrompter {
 
     private func shouldPrompt() -> Bool {
         guard !self.isPrompting else { return false }
+        // Bundled gateway doesn't need the CLI installed via npm.
+        if CommandResolver.bundledGatewayEntrypoint() != nil { return false }
         guard AppStateStore.shared.onboardingSeen else { return false }
         guard AppStateStore.shared.connectionMode == .local else { return false }
         guard CLIInstaller.installedLocation() == nil else { return false }

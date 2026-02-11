@@ -38,10 +38,13 @@ final class GatewayProcessManager {
     private(set) var environmentStatus: GatewayEnvironmentStatus = .checking
     private(set) var existingGatewayDetails: String?
     private(set) var lastFailureReason: String?
+    /// Auth token generated for the bundled gateway process. Used by GatewayEndpointStore to connect.
+    private(set) var bundledGatewayToken: String?
     private var desiredActive = false
     private var environmentRefreshTask: Task<Void, Never>?
     private var lastEnvironmentRefresh: Date?
     private var logRefreshTask: Task<Void, Never>?
+    private var bundledProcess: Process?
     #if DEBUG
     private var testingConnection: GatewayConnection?
     #endif
@@ -49,6 +52,13 @@ final class GatewayProcessManager {
 
     private let logLimit = 20000 // characters to keep in-memory
     private let environmentRefreshMinInterval: TimeInterval = 30
+
+    private init() {
+        // Wire up the token accessor so GatewayEndpointStore can read the bundled gateway token.
+        _bundledGatewayTokenAccessor = { [weak self] in
+            self?.bundledGatewayToken
+        }
+    }
     private var connection: GatewayConnection {
         #if DEBUG
         return self.testingConnection ?? .shared
@@ -79,6 +89,12 @@ final class GatewayProcessManager {
 
     func ensureLaunchAgentEnabledIfNeeded() async {
         guard !CommandResolver.connectionModeIsRemote() else { return }
+        // Bundled mode manages the gateway as a child process; skip launchd.
+        if CommandResolver.bundledNodeBinary() != nil,
+           CommandResolver.bundledGatewayEntrypoint() != nil
+        {
+            return
+        }
         if GatewayLaunchAgentManager.isLaunchAgentWriteDisabled() {
             self.appendLog("[gateway] launchd auto-enable skipped (attach-only)\n")
             self.logger.info("gateway launchd auto-enable skipped (disable marker set)")
@@ -119,6 +135,21 @@ final class GatewayProcessManager {
             if await self.attachExistingGatewayIfAvailable() {
                 return
             }
+
+            // Bundled mode: resolve the command and launch directly, bypassing launchd entirely.
+            if CommandResolver.bundledNodeBinary() != nil,
+               CommandResolver.bundledGatewayEntrypoint() != nil
+            {
+                let resolution = await Task.detached(priority: .utility) {
+                    GatewayEnvironment.resolveGatewayCommand()
+                }.value
+                await MainActor.run { self.environmentStatus = resolution.status }
+                if let command = resolution.command {
+                    await self.launchBundledGateway(command: command)
+                    return
+                }
+            }
+
             await self.enableLaunchdGateway()
         }
     }
@@ -129,16 +160,31 @@ final class GatewayProcessManager {
         self.lastFailureReason = nil
         self.status = .stopped
         self.logger.info("gateway stop requested")
+
+        self.terminateBundledProcess()
+
         if CommandResolver.connectionModeIsRemote() {
             return
         }
-        let bundlePath = Bundle.main.bundleURL.path
-        Task {
-            _ = await GatewayLaunchAgentManager.set(
-                enabled: false,
-                bundlePath: bundlePath,
-                port: GatewayEnvironment.gatewayPort())
+        // Only uninstall launchd if we're NOT in bundled mode.
+        if CommandResolver.bundledNodeBinary() == nil {
+            let bundlePath = Bundle.main.bundleURL.path
+            Task {
+                _ = await GatewayLaunchAgentManager.set(
+                    enabled: false,
+                    bundlePath: bundlePath,
+                    port: GatewayEnvironment.gatewayPort())
+            }
         }
+    }
+
+    func terminateBundledProcess() {
+        if let proc = self.bundledProcess, proc.isRunning {
+            proc.terminate()
+            self.logger.info("bundled gateway process terminated")
+        }
+        self.bundledProcess = nil
+        self.bundledGatewayToken = nil
     }
 
     func clearLastFailure() {
@@ -303,11 +349,19 @@ final class GatewayProcessManager {
             GatewayEnvironment.resolveGatewayCommand()
         }.value
         await MainActor.run { self.environmentStatus = resolution.status }
-        guard resolution.command != nil else {
+        guard let command = resolution.command else {
             await MainActor.run {
                 self.status = .failed(resolution.status.message)
             }
             self.logger.error("gateway command resolve failed: \(resolution.status.message)")
+            return
+        }
+
+        // Bundled mode: launch the gateway directly as a child process instead of using launchd.
+        if CommandResolver.bundledNodeBinary() != nil,
+           CommandResolver.bundledGatewayEntrypoint() != nil
+        {
+            await self.launchBundledGateway(command: command)
             return
         }
 
@@ -356,6 +410,98 @@ final class GatewayProcessManager {
         self.logger.warning("gateway start timed out")
     }
 
+    /// Launch the bundled gateway as a direct child process (no launchd).
+    private func launchBundledGateway(command: [String]) async {
+        guard command.count >= 2 else {
+            self.status = .failed("Invalid bundled gateway command")
+            return
+        }
+
+        // Terminate any previous bundled process.
+        if let existing = self.bundledProcess, existing.isRunning {
+            existing.terminate()
+            self.bundledProcess = nil
+        }
+
+        let port = GatewayEnvironment.gatewayPort()
+        self.appendLog("[gateway] launching bundled gateway on port \(port)\n")
+        self.logger.info("gateway launching bundled process port=\(port)")
+
+        // Generate a random token for gateway auth and expose it via env var
+        // so the app's WebSocket client can read it.
+        let token = UUID().uuidString
+        self.bundledGatewayToken = token
+
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: command[0])
+        process.arguments = Array(command.dropFirst()) + ["--token", token]
+
+        // Set working directory to the gateway bundle directory.
+        if let resourcePath = Bundle.main.resourcePath {
+            let gatewayDir = URL(fileURLWithPath: resourcePath).appendingPathComponent("gateway")
+            process.currentDirectoryURL = gatewayDir
+
+            // Set NODE_PATH so require() can resolve modules from the bundled node_modules.
+            let nodeModulesPath = gatewayDir.appendingPathComponent("node_modules").path
+            var env = ProcessInfo.processInfo.environment
+            env["NODE_PATH"] = nodeModulesPath
+            env["PATH"] = CommandResolver.preferredPaths().joined(separator: ":")
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+            process.environment = env
+        }
+
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = pipe
+
+        // Read process output asynchronously and append to log.
+        let handle = pipe.fileHandleForReading
+        handle.readabilityHandler = { [weak self] fh in
+            let data = fh.availableData
+            guard !data.isEmpty, let text = String(data: data, encoding: .utf8) else { return }
+            DispatchQueue.main.async { [weak self] in
+                self?.appendLog(text)
+            }
+        }
+
+        do {
+            try process.run()
+        } catch {
+            self.status = .failed("Failed to launch bundled gateway: \(error.localizedDescription)")
+            self.lastFailureReason = error.localizedDescription
+            self.logger.error("bundled gateway launch failed: \(error.localizedDescription)")
+            return
+        }
+
+        self.bundledProcess = process
+
+        // Poll the HTTP /health endpoint (not WebSocket RPC) for up to 12 seconds.
+        // We use plain HTTP because the WebSocket requires auth from the endpoint store,
+        // which may not have the bundled token cached yet.
+        let deadline = Date().addingTimeInterval(12)
+        while Date() < deadline {
+            if !self.desiredActive {
+                process.terminate()
+                self.bundledProcess = nil
+                return
+            }
+            if await PortGuardian.shared.probeGatewayHealth(port: port, timeout: 1.5) {
+                self.clearLastFailure()
+                self.status = .running(details: "pid \(process.processIdentifier) (bundled)")
+                self.logger.info("bundled gateway started pid=\(process.processIdentifier)")
+                // Refresh the endpoint store so it picks up the bundled token.
+                Task { await GatewayEndpointStore.shared.setMode(.local) }
+                self.refreshControlChannelIfNeeded(reason: "bundled gateway started")
+                return
+            }
+            try? await Task.sleep(nanoseconds: 400_000_000)
+        }
+
+        self.status = .failed("Bundled gateway did not start in time")
+        self.lastFailureReason = "bundled start timeout"
+        self.logger.warning("bundled gateway start timed out")
+    }
+
     private func appendLog(_ chunk: String) {
         self.log.append(chunk)
         if self.log.count > self.logLimit {
@@ -376,16 +522,15 @@ final class GatewayProcessManager {
     }
 
     func waitForGatewayReady(timeout: TimeInterval = 6) async -> Bool {
+        let port = GatewayEnvironment.gatewayPort()
         let deadline = Date().addingTimeInterval(timeout)
         while Date() < deadline {
             if !self.desiredActive { return false }
-            do {
-                _ = try await self.connection.requestRaw(method: .health, timeoutMs: 1500)
+            if await PortGuardian.shared.probeGatewayHealth(port: port, timeout: 1.5) {
                 self.clearLastFailure()
                 return true
-            } catch {
-                try? await Task.sleep(nanoseconds: 300_000_000)
             }
+            try? await Task.sleep(nanoseconds: 300_000_000)
         }
         self.appendLog("[gateway] readiness wait timed out\n")
         self.logger.warning("gateway readiness wait timed out")

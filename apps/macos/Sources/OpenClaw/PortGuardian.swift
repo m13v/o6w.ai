@@ -42,6 +42,15 @@ actor PortGuardian {
             self.logger.info("port sweep skipped (mode=unconfigured)")
             return
         }
+        // In bundled mode the app manages the gateway lifecycle directly as a child process.
+        // Sweeping would kill the gateway the app just started (node may spawn child workers
+        // whose command strings don't match the expected patterns).
+        if CommandResolver.bundledNodeBinary() != nil,
+           CommandResolver.bundledGatewayEntrypoint() != nil
+        {
+            self.logger.info("port sweep skipped (bundled mode)")
+            return
+        }
         let ports = [GatewayEnvironment.gatewayPort()]
         for port in ports {
             let listeners = await self.listeners(on: port)
@@ -359,6 +368,9 @@ actor PortGuardian {
         case .local:
             // The gateway daemon may listen as `openclaw` or as its runtime (`node`, `bun`, etc).
             if full.contains("gateway-daemon") { return true }
+            // Bundled gateway runs as: node openclaw.mjs gateway --port ...
+            if full.contains("openclaw.mjs") && full.contains("gateway") { return true }
+            if full.contains("openclaw") && full.contains("gateway") && full.contains("--port") { return true }
             // If args are unavailable, treat a CLI listener as expected.
             if cmd.contains("openclaw"), full == cmd { return true }
             return false

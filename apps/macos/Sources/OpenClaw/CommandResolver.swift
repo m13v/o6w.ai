@@ -14,6 +14,24 @@ enum CommandResolver {
         return nil
     }
 
+    // MARK: - Bundled app helpers
+
+    static func bundledNodeBinary() -> String? {
+        guard let resourcePath = Bundle.main.resourcePath else { return nil }
+        let path = (resourcePath as NSString).appendingPathComponent("node/bin/node")
+        return FileManager().isExecutableFile(atPath: path) ? path : nil
+    }
+
+    static func bundledGatewayEntrypoint() -> String? {
+        guard let resourcePath = Bundle.main.resourcePath else { return nil }
+        let gatewayRoot = URL(fileURLWithPath: resourcePath).appendingPathComponent("gateway")
+        // Prefer openclaw.mjs for bundled mode — it's the full CLI entrypoint that supports
+        // the "gateway" subcommand. dist/index.js is a library entry that lacks CLI commands.
+        let openclawEntry = gatewayRoot.appendingPathComponent("openclaw.mjs").path
+        if FileManager().isReadableFile(atPath: openclawEntry) { return openclawEntry }
+        return self.gatewayEntrypoint(in: gatewayRoot)
+    }
+
     static func runtimeResolution() -> Result<RuntimeResolution, RuntimeResolutionError> {
         RuntimeLocator.resolve(searchPaths: self.preferredPaths())
     }
@@ -85,6 +103,13 @@ enum CommandResolver {
             "/usr/bin",
             "/bin",
         ]
+        // Bundled Node.js inside the .app takes highest priority.
+        if let resourcePath = Bundle.main.resourcePath {
+            let bundledNodeBin = (resourcePath as NSString).appendingPathComponent("node/bin")
+            if FileManager().isExecutableFile(atPath: (bundledNodeBin as NSString).appendingPathComponent("node")) {
+                extras.insert(bundledNodeBin, at: 0)
+            }
+        }
         #if DEBUG
         // Dev-only convenience. Avoid project-local PATH hijacking in release builds.
         extras.insert(projectRoot.appendingPathComponent("node_modules/.bin").path, at: 0)

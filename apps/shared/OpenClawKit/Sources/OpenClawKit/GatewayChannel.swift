@@ -687,6 +687,33 @@ public actor GatewayChannelActor {
         }
     }
 
+    /// Recursively converts `OpenClawKit.AnyCodable` values into `ProtoAnyCodable`
+    /// so the encoder only sees types from the Protocol module.
+    private func toProto(_ value: Any) -> ProtoAnyCodable {
+        // Unwrap OpenClawKit.AnyCodable wrappers.
+        if let ac = value as? AnyCodable {
+            return self.toProto(ac.value)
+        }
+        // Recursively convert typed dictionaries.
+        if let dict = value as? [String: AnyCodable] {
+            return ProtoAnyCodable(dict.mapValues { self.toProto($0.value) })
+        }
+        // Recursively convert typed arrays.
+        if let arr = value as? [AnyCodable] {
+            return ProtoAnyCodable(arr.map { self.toProto($0.value) })
+        }
+        // Recursively convert untyped dictionaries (may contain nested AnyCodable).
+        if let dict = value as? [String: Any] {
+            return ProtoAnyCodable(dict.mapValues { self.toProto($0) })
+        }
+        // Recursively convert untyped arrays.
+        if let arr = value as? [Any] {
+            return ProtoAnyCodable(arr.map { self.toProto($0) })
+        }
+        // Primitives (String, Int, Double, Bool, NSNull) pass through directly.
+        return ProtoAnyCodable(value)
+    }
+
     private func encodeRequest(
         method: String,
         params: [String: AnyCodable]?,
@@ -696,7 +723,7 @@ public actor GatewayChannelActor {
         // Encode request using the generated models to avoid JSONSerialization/ObjC bridging pitfalls.
         let paramsObject: ProtoAnyCodable? = params.map { entries in
             let dict = entries.reduce(into: [String: ProtoAnyCodable]()) { dict, entry in
-                dict[entry.key] = ProtoAnyCodable(entry.value.value)
+                dict[entry.key] = self.toProto(entry.value.value)
             }
             return ProtoAnyCodable(dict)
         }

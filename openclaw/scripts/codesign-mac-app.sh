@@ -254,13 +254,13 @@ if [ -f "$BUNDLED_NODE" ]; then
   sign_item "$BUNDLED_NODE" "$ENT_TMP_RUNTIME"
 fi
 
-# Sign native .node addons in bundled gateway
-GATEWAY_NM="$APP_BUNDLE/Contents/Resources/gateway/node_modules"
-if [ -d "$GATEWAY_NM" ]; then
-  find "$GATEWAY_NM" -name "*.node" -type f -print0 | while IFS= read -r -d '' addon; do
-    if /usr/bin/file "$addon" | /usr/bin/grep -q "Mach-O"; then
-      echo "Signing native addon: $(basename "$addon")"
-      sign_item "$addon" "$ENT_TMP_RUNTIME"
+# Sign ALL Mach-O binaries in bundled gateway (native addons, dylibs, executables)
+GATEWAY_RES="$APP_BUNDLE/Contents/Resources/gateway"
+if [ -d "$GATEWAY_RES" ]; then
+  find "$GATEWAY_RES" -type f \( -name "*.node" -o -name "*.so" -o -name "*.dylib" -o -name "spawn-helper" -o -name "esbuild" -o -name "tsgo" -o -name "tsgolint" \) -print0 | while IFS= read -r -d '' bin; do
+    if /usr/bin/file "$bin" | /usr/bin/grep -q "Mach-O"; then
+      echo "Signing gateway binary: $(basename "$bin")"
+      sign_item "$bin" "$ENT_TMP_RUNTIME"
     fi
   done
 fi

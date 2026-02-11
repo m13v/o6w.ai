@@ -311,7 +311,12 @@ done
 
 for dir in dist node_modules skills extensions docs; do
   if [ -d "$ROOT_DIR/$dir" ]; then
-    cp -R "$ROOT_DIR/$dir" "$GATEWAY_DEST/"
+    # Use rsync for dist/ to exclude the built .app (avoids recursive nesting).
+    if [ "$dir" = "dist" ]; then
+      rsync -a --exclude='*.app' "$ROOT_DIR/$dir/" "$GATEWAY_DEST/$dir/"
+    else
+      cp -R "$ROOT_DIR/$dir" "$GATEWAY_DEST/"
+    fi
   fi
 done
 
@@ -346,6 +351,9 @@ if [ -d "$GATEWAY_DEST/node_modules" ]; then
   # Remove Playwright browser binaries (large, not needed at runtime)
   find "$NM" -type d -name ".local-browsers" -exec rm -rf {} + 2>/dev/null || true
   find "$NM" -path "*/playwright-core/browsers*" -exec rm -rf {} + 2>/dev/null || true
+
+  # Remove broken symlinks left after pruning (e.g. .bin/tsc -> pruned typescript)
+  find "$NM" -type l ! -exec test -e {} \; -delete 2>/dev/null || true
 fi
 
 echo "⏹  Stopping any running OpenClaw"

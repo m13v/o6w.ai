@@ -24,12 +24,22 @@ o6w.ai/
 
 ## Credentials
 
-| Credential | Value/Source |
-|-----------|-------------|
-| SIGN_IDENTITY | `Developer ID Application: Matthew Diakonov (S6DP5HF77G)` |
+All secrets are stored in macOS Keychain or the omi-desktop `.env` file. **Never hardcode passwords in this file.**
+
+```bash
+# Load credentials before running release steps:
+NOTARIZE_PASSWORD=$(grep NOTARIZE_PASSWORD /Users/matthewdi/omi-desktop/.env | cut -d= -f2)
+APPLE_ID="matthew.heartful@gmail.com"
+TEAM_ID="S6DP5HF77G"
+SIGN_IDENTITY="Developer ID Application: Matthew Diakonov ($TEAM_ID)"
+```
+
+| Credential | Source |
+|-----------|--------|
+| SIGN_IDENTITY | Hardcoded (public info from certificate) |
 | TEAM_ID | `S6DP5HF77G` |
 | APPLE_ID | `matthew.heartful@gmail.com` |
-| NOTARIZE_PASSWORD | From omi-desktop `.env`: `***REDACTED***` |
+| NOTARIZE_PASSWORD | `omi-desktop/.env` (app-specific password from appleid.apple.com) |
 | GitHub repo | `m13v/o6w.ai` |
 
 ## Release Process
@@ -77,7 +87,7 @@ ditto -c -k --keepParent dist/OpenClaw.app dist/OpenClaw.zip
 # Submit and wait (typically 5-15 minutes)
 xcrun notarytool submit dist/OpenClaw.zip \
   --apple-id "matthew.heartful@gmail.com" \
-  --password "***REDACTED***" \
+  --password "$NOTARIZE_PASSWORD" \
   --team-id "S6DP5HF77G" \
   --wait
 
@@ -112,7 +122,7 @@ rm -rf "$DMG_DIR"
 # Notarize the DMG too
 xcrun notarytool submit dist/OpenClaw.dmg \
   --apple-id "matthew.heartful@gmail.com" \
-  --password "***REDACTED***" \
+  --password "$NOTARIZE_PASSWORD" \
   --team-id "S6DP5HF77G" \
   --wait
 xcrun stapler staple dist/OpenClaw.dmg
@@ -142,7 +152,7 @@ EOF
 # Get the submission log
 xcrun notarytool log <submission-id> \
   --apple-id "matthew.heartful@gmail.com" \
-  --password "***REDACTED***" \
+  --password "$NOTARIZE_PASSWORD" \
   --team-id "S6DP5HF77G"
 ```
 Common cause: unsigned Mach-O binary in gateway. Fix in `scripts/codesign-mac-app.sh` by adding the binary name to the find pattern.

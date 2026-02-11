@@ -28,18 +28,18 @@ All secrets are stored in macOS Keychain or the omi-desktop `.env` file. **Never
 
 ```bash
 # Load credentials before running release steps:
-NOTARIZE_PASSWORD=$(grep NOTARIZE_PASSWORD /Users/matthewdi/omi-desktop/.env | cut -d= -f2)
-APPLE_ID="matthew.heartful@gmail.com"
-TEAM_ID="S6DP5HF77G"
-SIGN_IDENTITY="Developer ID Application: Matthew Diakonov ($TEAM_ID)"
+source openclaw/.env
 ```
+
+Credentials are stored in `openclaw/.env` (gitignored). Required keys:
+- `NOTARIZE_PASSWORD` — Apple app-specific password (from appleid.apple.com)
+- `APPLE_ID` — Apple ID email
+- `TEAM_ID` — Apple Developer Team ID
+- `SIGN_IDENTITY` — Code signing certificate name
 
 | Credential | Source |
 |-----------|--------|
-| SIGN_IDENTITY | Hardcoded (public info from certificate) |
-| TEAM_ID | `S6DP5HF77G` |
-| APPLE_ID | `matthew.heartful@gmail.com` |
-| NOTARIZE_PASSWORD | `omi-desktop/.env` (app-specific password from appleid.apple.com) |
+| All | `openclaw/.env` (gitignored, never commit) |
 | GitHub repo | `m13v/o6w.ai` |
 
 ## Release Process
@@ -57,7 +57,7 @@ echo "Last release: $LAST_TAG"
 ```bash
 cd /Users/matthewdi/o6w.ai/openclaw
 rm -rf dist/OpenClaw.app
-SIGN_IDENTITY="Developer ID Application: Matthew Diakonov (S6DP5HF77G)" scripts/package-mac-app.sh
+SIGN_IDENTITY="$SIGN_IDENTITY" scripts/package-mac-app.sh
 ```
 
 This runs the full pipeline:
@@ -86,9 +86,9 @@ ditto -c -k --keepParent dist/OpenClaw.app dist/OpenClaw.zip
 
 # Submit and wait (typically 5-15 minutes)
 xcrun notarytool submit dist/OpenClaw.zip \
-  --apple-id "matthew.heartful@gmail.com" \
+  --apple-id "$APPLE_ID" \
   --password "$NOTARIZE_PASSWORD" \
-  --team-id "S6DP5HF77G" \
+  --team-id "$TEAM_ID" \
   --wait
 
 # Staple the ticket
@@ -121,9 +121,9 @@ rm -rf "$DMG_DIR"
 
 # Notarize the DMG too
 xcrun notarytool submit dist/OpenClaw.dmg \
-  --apple-id "matthew.heartful@gmail.com" \
+  --apple-id "$APPLE_ID" \
   --password "$NOTARIZE_PASSWORD" \
-  --team-id "S6DP5HF77G" \
+  --team-id "$TEAM_ID" \
   --wait
 xcrun stapler staple dist/OpenClaw.dmg
 ```
@@ -151,9 +151,9 @@ EOF
 ```bash
 # Get the submission log
 xcrun notarytool log <submission-id> \
-  --apple-id "matthew.heartful@gmail.com" \
+  --apple-id "$APPLE_ID" \
   --password "$NOTARIZE_PASSWORD" \
-  --team-id "S6DP5HF77G"
+  --team-id "$TEAM_ID"
 ```
 Common cause: unsigned Mach-O binary in gateway. Fix in `scripts/codesign-mac-app.sh` by adding the binary name to the find pattern.
 

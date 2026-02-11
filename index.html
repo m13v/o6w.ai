@@ -403,6 +403,34 @@
       margin-top: 10px;
       opacity: 0.7;
     }
+    .download-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 16px 36px;
+      background: var(--teal);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-decoration: none;
+      width: fit-content;
+    }
+    .download-btn:hover {
+      background: var(--teal-light);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(27, 123, 110, 0.35);
+    }
 
     /* ===== APP MOCKUP ===== */
     .hero-visual {
@@ -446,45 +474,143 @@
       font-weight: 500;
     }
     .app-body {
-      padding: 24px;
-      min-height: 320px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.82rem;
-      line-height: 1.8;
+      padding: 0;
+      min-height: 340px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      line-height: 1.5;
       color: var(--charcoal-light);
+    }
+    .app-chat-body {
+      display: flex;
+      min-height: 340px;
+    }
+    .app-sidebar {
+      width: 140px;
+      background: var(--cream-dark);
+      border-right: 1px solid var(--border);
+      padding: 14px 10px;
+      flex-shrink: 0;
+    }
+    .sidebar-section-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--slate);
+      opacity: 0.6;
+      margin-bottom: 6px;
+      padding-left: 4px;
+    }
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      color: var(--charcoal-light);
+      margin-bottom: 2px;
+      cursor: default;
+    }
+    .sidebar-item.active {
+      background: white;
+      font-weight: 600;
+      color: var(--charcoal);
+    }
+    .sidebar-icon {
+      font-size: 0.7rem;
+    }
+    .sidebar-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--teal);
+      flex-shrink: 0;
+    }
+    .sidebar-item.connected {
+      color: var(--teal);
+      font-size: 0.72rem;
+    }
+    .app-chat {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      gap: 10px;
+      background: white;
+    }
+    .chat-message {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+    .chat-message.user {
+      justify-content: flex-end;
+    }
+    .chat-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: var(--teal);
+      color: white;
+      font-size: 0.55rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .chat-bubble {
+      padding: 10px 14px;
+      border-radius: 14px;
+      max-width: 85%;
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+    .user-bubble {
+      background: var(--teal);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    .ai-bubble {
+      background: var(--cream-dark);
+      color: var(--charcoal);
+      border-bottom-left-radius: 4px;
+    }
+    .ai-bubble .accent {
+      color: var(--teal);
+      font-weight: 600;
+    }
+    .chat-input-mock {
+      margin-top: auto;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--cream);
+    }
+    .chat-input-placeholder {
+      font-size: 0.8rem;
+      color: var(--slate);
+      opacity: 0.5;
     }
     .app-line {
       opacity: 0;
       animation: typeIn 0.5s ease forwards;
     }
-    .app-line .prompt {
-      color: var(--teal);
-      font-weight: 500;
-    }
-    .app-line .dim {
-      color: var(--slate);
-      opacity: 0.6;
-    }
     .app-line .accent {
-      color: var(--amber);
-    }
-    .app-line .success {
       color: var(--teal);
+      font-weight: 600;
     }
     @keyframes typeIn {
-      from { opacity: 0; transform: translateX(-8px); }
-      to { opacity: 1; transform: translateX(0); }
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .app-line:nth-child(1) { animation-delay: 1.2s; }
-    .app-line:nth-child(2) { animation-delay: 1.6s; }
-    .app-line:nth-child(3) { animation-delay: 2.0s; }
-    .app-line:nth-child(4) { animation-delay: 2.4s; }
-    .app-line:nth-child(5) { animation-delay: 2.8s; }
-    .app-line:nth-child(6) { animation-delay: 3.2s; }
-    .app-line:nth-child(7) { animation-delay: 3.6s; }
-    .app-line:nth-child(8) { animation-delay: 4.0s; }
-    .app-line:nth-child(9) { animation-delay: 4.4s; }
-    .app-line:nth-child(10) { animation-delay: 4.8s; }
+    .app-line:nth-child(2) { animation-delay: 1.8s; }
+    .app-line:nth-child(3) { animation-delay: 2.6s; }
+    .app-line:nth-child(4) { animation-delay: 3.4s; }
+    .app-line:nth-child(5) { animation-delay: 4.0s; }
 
     .floating-shape {
       position: absolute;
@@ -701,21 +827,36 @@
       width: 18px;
       height: 18px;
     }
-    .os-code-block {
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+    .os-info-block {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: var(--radius);
-      padding: 28px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
-      line-height: 2;
-      color: rgba(254, 251, 244, 0.7);
+      padding: 32px;
     }
-    .os-code-block .cmd {
+    .os-info-header {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--cream);
+      margin-bottom: 20px;
+    }
+    .os-info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .os-info-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.92rem;
+      color: rgba(254, 251, 244, 0.75);
+    }
+    .os-info-check {
       color: var(--teal-light);
-    }
-    .os-code-block .comment {
-      color: rgba(254, 251, 244, 0.3);
+      font-weight: 700;
+      font-size: 1rem;
+      flex-shrink: 0;
     }
     .opensource-glow {
       position: absolute;
@@ -855,7 +996,7 @@
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
         <span>185k</span>
       </a>
-      <a href="#waitlist" class="nav-cta">Join Waitlist</a>
+      <a href="#waitlist" class="nav-cta">Download</a>
     </div>
   </nav>
 
@@ -868,11 +1009,11 @@
       <div class="hero-text">
         <div class="hero-badge">
           <span class="badge-dot"></span>
-          Open Source &middot; MIT Licensed
+          Based on OpenClaw &middot; 185K Stars
         </div>
         <h1>Cloud AI on <em>your</em> desktop.</h1>
         <p class="hero-sub">
-          The open-source desktop app that brings AI to your machine.
+          The polished desktop app built on <a href="https://github.com/openclaw/openclaw" target="_blank" rel="noopener" style="color: var(--teal); text-decoration: underline; text-underline-offset: 3px;">OpenClaw</a>, the open-source AI assistant with 185K GitHub stars.
           Private by default. Connect any provider. Control everything.
         </p>
         <div class="waitlist-form" id="waitlist">
@@ -886,11 +1027,20 @@
               Windows
             </button>
           </div>
-          <div class="email-row">
+          <!-- macOS: Download button -->
+          <div class="download-row" id="macDownload">
+            <a href="#download" class="download-btn" id="downloadBtn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download for macOS
+            </a>
+            <p class="form-note">Free & open source. Apple Silicon & Intel.</p>
+          </div>
+          <!-- Windows: Email waitlist -->
+          <div class="email-row" id="winWaitlist" style="display: none;">
             <input type="email" id="emailInput" placeholder="you@example.com" aria-label="Email address" required>
             <button type="button" id="joinBtn" onclick="handleWaitlist()">Join Waitlist</button>
           </div>
-          <p class="form-note">Free & open source. We'll notify you at launch.</p>
+          <p class="form-note" id="winNote" style="display: none;">Windows coming soon. We'll notify you at launch.</p>
         </div>
         <div class="waitlist-success" id="waitlistSuccess">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="10" fill="currentColor" opacity="0.15"/><path d="M6 10l3 3 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -907,17 +1057,52 @@
             <div class="app-dot green"></div>
             <span class="app-titlebar-text">o6w</span>
           </div>
-          <div class="app-body">
-            <div class="app-line"><span class="prompt">$</span> o6w start</div>
-            <div class="app-line"><span class="dim">  Loading providers...</span></div>
-            <div class="app-line"><span class="success">  &#10003;</span> Anthropic Claude connected</div>
-            <div class="app-line"><span class="success">  &#10003;</span> OpenAI GPT connected</div>
-            <div class="app-line"><span class="success">  &#10003;</span> Local Ollama ready</div>
-            <div class="app-line"><span class="dim">  Loading channels...</span></div>
-            <div class="app-line"><span class="success">  &#10003;</span> WhatsApp &middot; Telegram &middot; Slack</div>
-            <div class="app-line"><span class="dim">  Memory loaded (2,847 entries)</span></div>
-            <div class="app-line">&nbsp;</div>
-            <div class="app-line"><span class="accent">  Ready.</span> <span class="dim">Your AI is listening.</span></div>
+          <div class="app-body app-chat-body">
+            <div class="app-sidebar">
+              <div class="sidebar-section-label">Channels</div>
+              <div class="sidebar-item active">
+                <span class="sidebar-icon">💬</span> WhatsApp
+              </div>
+              <div class="sidebar-item">
+                <span class="sidebar-icon">📨</span> Telegram
+              </div>
+              <div class="sidebar-item">
+                <span class="sidebar-icon">💼</span> Slack
+              </div>
+              <div class="sidebar-section-label" style="margin-top: 12px;">Providers</div>
+              <div class="sidebar-item connected">
+                <span class="sidebar-dot"></span> Claude
+              </div>
+              <div class="sidebar-item connected">
+                <span class="sidebar-dot"></span> GPT-4
+              </div>
+              <div class="sidebar-item connected">
+                <span class="sidebar-dot"></span> Ollama
+              </div>
+            </div>
+            <div class="app-chat">
+              <div class="chat-message user app-line">
+                <div class="chat-bubble user-bubble">Book me a flight to Tokyo next week, cheapest option</div>
+              </div>
+              <div class="chat-message ai app-line">
+                <div class="chat-avatar">o6w</div>
+                <div class="chat-bubble ai-bubble">
+                  Found 3 flights. Best: <strong>$487 LAX→NRT</strong> on Mar 18, ANA via Kayak. Want me to fill in the booking form?
+                </div>
+              </div>
+              <div class="chat-message user app-line">
+                <div class="chat-bubble user-bubble">Yes, use my saved passport details</div>
+              </div>
+              <div class="chat-message ai app-line">
+                <div class="chat-avatar">o6w</div>
+                <div class="chat-bubble ai-bubble">
+                  Done — opened Kayak, filled passenger info from memory, selected window seat. <span class="accent">Ready for payment.</span>
+                </div>
+              </div>
+              <div class="chat-input-mock app-line">
+                <span class="chat-input-placeholder">Ask anything...</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -985,8 +1170,8 @@
     <div class="section-inner" style="position: relative; z-index: 1;">
       <div class="reveal">
         <p class="section-label">Open Source</p>
-        <h2 class="section-title">Built in the open.<br>Owned by everyone.</h2>
-        <p class="section-desc">MIT licensed. Fork it, extend it, make it yours. Backed by a community of thousands.</p>
+        <h2 class="section-title">Built on OpenClaw.<br>Owned by everyone.</h2>
+        <p class="section-desc">o6w is a polished desktop experience built on <strong>OpenClaw</strong>, the open-source AI assistant with 185K GitHub stars. MIT licensed.</p>
       </div>
       <div class="os-grid">
         <div class="reveal">
@@ -1017,15 +1202,34 @@
           </div>
         </div>
         <div class="reveal">
-          <div class="os-code-block">
-            <div><span class="comment"># Install in one line</span></div>
-            <div><span class="cmd">curl -fsSL</span> https://o6w.ai/install.sh | bash</div>
-            <div>&nbsp;</div>
-            <div><span class="comment"># Or via npm</span></div>
-            <div><span class="cmd">npm install -g</span> o6w</div>
-            <div>&nbsp;</div>
-            <div><span class="comment"># Start your AI</span></div>
-            <div><span class="cmd">o6w</span> start</div>
+          <div class="os-info-block">
+            <div class="os-info-header">What you get with o6w</div>
+            <div class="os-info-list">
+              <div class="os-info-item">
+                <span class="os-info-check">&#10003;</span>
+                <span>Native macOS & Windows desktop app</span>
+              </div>
+              <div class="os-info-item">
+                <span class="os-info-check">&#10003;</span>
+                <span>All of OpenClaw's power, zero config</span>
+              </div>
+              <div class="os-info-item">
+                <span class="os-info-check">&#10003;</span>
+                <span>Multi-provider AI (Claude, GPT, Gemini, Ollama)</span>
+              </div>
+              <div class="os-info-item">
+                <span class="os-info-check">&#10003;</span>
+                <span>Chat app integrations out of the box</span>
+              </div>
+              <div class="os-info-item">
+                <span class="os-info-check">&#10003;</span>
+                <span>Automatic updates & one-click setup</span>
+              </div>
+              <div class="os-info-item">
+                <span class="os-info-check">&#10003;</span>
+                <span>Your data stays on your machine</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1045,7 +1249,7 @@
         </ul>
       </div>
       <div class="footer-right">
-        &copy; 2026 o6w. Open source under MIT.
+        &copy; 2026 o6w. Built on <a href="https://github.com/openclaw/openclaw" target="_blank" rel="noopener" style="color: var(--slate); text-decoration: underline;">OpenClaw</a>. Open source under MIT.
       </div>
     </div>
   </footer>
@@ -1073,6 +1277,9 @@
 
     // ===== PLATFORM SELECTOR =====
     let selectedPlatform = 'macos';
+    const macDownload = document.getElementById('macDownload');
+    const winWaitlist = document.getElementById('winWaitlist');
+    const winNote = document.getElementById('winNote');
     document.querySelectorAll('.platform-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.platform-btn').forEach(b => {
@@ -1082,6 +1289,15 @@
         btn.classList.add('active');
         btn.setAttribute('aria-pressed', 'true');
         selectedPlatform = btn.dataset.platform;
+        if (selectedPlatform === 'macos') {
+          macDownload.style.display = '';
+          winWaitlist.style.display = 'none';
+          winNote.style.display = 'none';
+        } else {
+          macDownload.style.display = 'none';
+          winWaitlist.style.display = '';
+          winNote.style.display = '';
+        }
       });
     });
 

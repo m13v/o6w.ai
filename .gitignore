@@ -4,3 +4,10 @@
 *.jpg
 .playwright-mcp/
 scripts/
+
+# Stray markdown scratch files in repo root
+/*.md
+!README.md
+
+# Claude Code temp files
+tmpclaude-*

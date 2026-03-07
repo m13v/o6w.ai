@@ -1,0 +1,46 @@
+# o6w
+
+> A polished desktop app for OpenClaw, the open-source AI assistant with 185K GitHub stars.
+
+## What is o6w?
+
+o6w is a native desktop application built on OpenClaw that brings a full AI assistant to your machine with zero configuration. It runs locally, connects to any chat platform (WhatsApp, Telegram, Discord, Slack, Signal, iMessage), and supports multiple AI providers including Anthropic Claude, OpenAI GPT, Google Gemini, and local models via Ollama. Private by default — no cloud servers between you and your AI.
+
+## Key Features
+
+- **Runs Locally**: Your machine, your data. Works with Anthropic, OpenAI, Gemini, or fully local models via Ollama.
+- **Any Chat App**: WhatsApp, Telegram, Discord, Slack, Signal, or iMessage. Your AI lives where you already chat, in DMs and groups.
+- **Persistent Memory**: Remembers your preferences, context, and history. Becomes uniquely yours over time with local vector search.
+- **Browser Control**: Browse the web, fill forms, extract data from any site. Full Playwright-powered automation.
+- **System Access**: Read and write files, run shell commands, execute scripts. Full system access or sandboxed for safety.
+- **Skills & Plugins**: Extend with 50+ community skills or build your own. Gmail, GitHub, Spotify, Calendar, Smart Home, Twitter/X, and more.
+- **Multi-Provider AI**: Claude, GPT, Gemini, Ollama — use any provider, switch anytime.
+- **Zero Config**: All of OpenClaw's power without the setup complexity.
+
+## Links
+
+- [Homepage](https://o6w.ai)
+- [GitHub (o6w app)](https://github.com/m13v/o6w.ai)
+- [GitHub (OpenClaw)](https://github.com/openclaw/openclaw)
+- [Docs](https://github.com/openclaw/openclaw/blob/main/docs)
+- [Contributing](https://github.com/openclaw/openclaw/blob/main/CONTRIBUTING.md)
+
+## Platform
+
+- macOS (Apple Silicon / arm64, macOS 14+) — available now
+- Windows — coming soon
+
+## Pricing
+
+Free and open source. MIT licensed.
+
+## Open Source Stats
+
+- 185K GitHub stars
+- 31K forks
+- 500+ contributors
+
+## Contact
+
+- Website: https://o6w.ai
+- GitHub: https://github.com/m13v/o6w.ai
